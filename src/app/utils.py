@@ -1,5 +1,7 @@
 import os
 
+from httpx import HTTPStatusError
+
 from .wrapper import DadataAPIWrapper
 
 
@@ -72,7 +74,12 @@ def print_coordinates(api: DadataAPIWrapper) -> None:
     """Находит координаты нужного адреса"""
     clear()
     query = input("Введите желаемый адрес для того, чтобы узнать его координаты:\n")
-    values = api.suggest(query=query)
+    try:
+        values = api.suggest(query=query)
+    except HTTPStatusError:
+        print("Что-то пошло не так. Вероятно, ваш API-Ключ указан неправильно.")
+        pause()
+        return
     clear()
     print("Возможные адреса:")
     for serial, value in enumerate(values, 1):
