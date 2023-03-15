@@ -107,8 +107,8 @@ def menu() -> None:
         print("1. Получить координаты адреса")
         print("2. Настройки")
         print("0. Выход\n")
-        choice = get_choice()
 
+        choice = get_choice()
         match choice:
             case 1:
                 print_coordinates(api)
