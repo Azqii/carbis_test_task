@@ -13,8 +13,8 @@
     # Linux
     cd ~
     
-    # Windows
-    cd /d C:/
+    # Windows PowerShell
+    cd C:/
     ```
 2. Клонировать и перейти в репозиторий с проектом:
     ```shell
@@ -27,7 +27,7 @@
     # Linux
     python3 -m venv venv
    
-    # Windows
+    # Windows PowerShell
     python -m venv venv
     ```
 4. Активировать виртуальное окружение:
@@ -35,8 +35,8 @@
     # Linux
     source ./venv/bin/activate
    
-    # Windows
-    ./venv/Scripts/activate.bat
+    # Windows PowerShell
+    ./venv/Scripts/activate.ps1
     ```
 5. Установить зависимости:
     ```shell
