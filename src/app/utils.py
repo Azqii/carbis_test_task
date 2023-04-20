@@ -33,16 +33,15 @@ def language_settings(api: DadataAPIWrapper):
     print("0. Назад\n")
 
     choice = get_choice()
-    match choice:
-        case 1:
-            api.change_language("ru")
-        case 2:
-            api.change_language("en")
-        case 0:
-            return
-        case _:
-            print("Данного пункта нет в меню")
-            pause()
+    if choice == 1:
+        api.change_language("ru")
+    elif choice == 2:
+        api.change_language("en")
+    elif choice == 0:
+        return
+    else:
+        print("Данного пункта нет в меню")
+        pause()
 
 
 def settings(api: DadataAPIWrapper):
@@ -56,18 +55,17 @@ def settings(api: DadataAPIWrapper):
         print("0. Назад\n")
 
         choice = get_choice()
-        match choice:
-            case 1:
-                clear()
-                api_key = input("Введите новый API-Ключ: ")
-                api.change_api_key(api_key)
-            case 2:
-                language_settings(api)
-            case 0:
-                break
-            case _:
-                print("Данного пункта нет в меню. Попробуйте еще раз")
-                pause()
+        if choice == 1:
+            clear()
+            api_key = input("Введите новый API-Ключ: ")
+            api.change_api_key(api_key)
+        elif choice == 2:
+            language_settings(api)
+        elif choice == 0:
+            break
+        else:
+            print("Данного пункта нет в меню. Попробуйте еще раз")
+            pause()
 
 
 def print_coordinates(api: DadataAPIWrapper) -> None:
@@ -116,13 +114,12 @@ def menu() -> None:
         print("0. Выход\n")
 
         choice = get_choice()
-        match choice:
-            case 1:
-                print_coordinates(api)
-            case 2:
-                settings(api)
-            case 0:
-                break
-            case _:
-                print("Данного пункта нет в меню. Попробуйте еще раз")
-                pause()
+        if choice == 1:
+            print_coordinates(api)
+        elif choice == 2:
+            settings(api)
+        elif choice == 0:
+            break
+        else:
+            print("Данного пункта нет в меню. Попробуйте еще раз")
+            pause()
