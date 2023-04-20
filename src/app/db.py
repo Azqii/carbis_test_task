@@ -12,8 +12,8 @@ class LanguageEnum(enum.Enum):
     ru = "ru"
 
 
-class Settings(Base):
-    """'Модель' настроек"""
+class SettingsModel(Base):
+    """Модель настроек"""
     __tablename__ = "settings"
 
     id = Column(Integer, primary_key=True)
@@ -21,11 +21,11 @@ class Settings(Base):
     language = Column(Enum(LanguageEnum), default=LanguageEnum.ru, nullable=False)
 
 
-def create_db():
+def create_db() -> None:
     """Создает базу данных с таблицей и записью настроек в ней"""
     Base.metadata.create_all(bind=engine)
     session = get_db_session()
-    session.add(Settings())
+    session.add(SettingsModel())
     session.commit()
 
 

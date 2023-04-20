@@ -1,7 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Callable
 
+from httpx import HTTPStatusError
+
 from .utils import clear, pause
+from .wrapper import Settings, DadataAPIWrapper
+from .db import get_db_session, LanguageEnum
+
+
+api = DadataAPIWrapper(Settings(get_db_session()))
 
 
 class AbstractStateMachine(ABC):
@@ -39,7 +46,7 @@ class Menu(AbstractStateMachine):
 class SelectorState(AbstractMenuState):
     """Состояние из которого происходит выбор следующего состояния State Machine'ы"""
 
-    def __init__(self, title: str, states: List["AbstractMenuState"]):
+    def __init__(self, title: str, states: List["AbstractMenuState"]) -> None:
         super().__init__(title)
         self._states = states
 
@@ -71,7 +78,7 @@ class SelectorState(AbstractMenuState):
 class FunctionState(AbstractMenuState):
     """Состояние State Machine'ы из которого происходит вызов переданной функции"""
 
-    def __init__(self, title: str, function: Callable[[AbstractMenuState, AbstractStateMachine], None]):
+    def __init__(self, title: str, function: Callable[[AbstractMenuState, AbstractStateMachine], None]) -> None:
         super().__init__(title)
         self._function = function
 
@@ -80,41 +87,70 @@ class FunctionState(AbstractMenuState):
 
 
 def find_coordinates(called_from_state: AbstractMenuState, state_machine: AbstractStateMachine) -> None:
-    """Поиск координат"""
-    print("Координаты найдены")  # FIXME: сделать нормальный поиск координат
-    pause()
+    """Поиск и отображение координат по адресу"""
     state_machine.current_state = called_from_state.back_state
+
+    query = input("Введите адрес, для которого желаете узнать координаты:\n")
+    try:
+        addresses = api.suggest(query=query)
+    except HTTPStatusError:
+        print("\nЧто-то пошло не так. Вероятно, ваш API-Ключ указан неправильно.")
+        pause()
+        return
+
+    clear()
+    print("Возможные адреса:")
+    for serial_number, address in enumerate(addresses, 1):
+        print(f"{serial_number}. {address['value']}")
+
+    try:
+        user_choice = int(input("\nВведите порядковый номер нужного вам адреса: "))
+        address = api.suggest(query=addresses[user_choice-1]["unrestricted_value"], count=1)[0]
+    except (ValueError, IndexError):
+        print("\nВы ввели недопустимое значение.")
+        pause()
+        return
+
+    clear()
+    print(f"Адрес: {address['value']}\n"
+          f"Координаты: {address['data']['geo_lat']}(широта), {address['data']['geo_lon']}(долгота)")
+    pause()
 
 
 def show_settings(called_from_state: AbstractMenuState, state_machine: AbstractStateMachine) -> None:
     """Отображение настроек"""
-    print("Настройки показаны")  # FIXME: сделать нормальное отображение настроек
+    print(f"API-Ключ - {api.settings.fields.api_key}\n"
+          f"Язык возвращаемых ответов - {api.settings.fields.language.value}\n")
+    pause()
+    state_machine.current_state = called_from_state.back_state
+
+
+def set_api_key(called_from_state: AbstractMenuState, state_machine: AbstractStateMachine) -> None:
+    """Установка API-Ключа в настройках"""
+    api_key = input("Введите новый API-Ключ для изменения: ")
+    api.settings.change_api_key(api_key)
+    print("\nAPI-Ключ успешно изменен!\n")
     pause()
     state_machine.current_state = called_from_state.back_state
 
 
 def set_russian_language(called_from_state: AbstractMenuState, state_machine: AbstractStateMachine) -> None:
     """Установка русского языка в настройках"""
-    print("Язык изменен на русский")  # FIXME: сделать нормальную смену языка
+    api.settings.change_language(LanguageEnum.ru)
+    print("Язык ответов успешно изменен на Русский!\n")
     pause()
     state_machine.current_state = called_from_state.back_state.back_state
 
 
 def set_english_language(called_from_state: AbstractMenuState, state_machine: AbstractStateMachine) -> None:
     """Установка английского языка в настройках"""
-    print("Язык изменен на английский")  # FIXME: сделать нормальную смену языка
+    api.settings.change_language(LanguageEnum.en)
+    print("Язык ответов успешно изменен на Английский!\n")
     pause()
     state_machine.current_state = called_from_state.back_state.back_state
 
 
-def set_api_key(called_from_state: AbstractMenuState, state_machine: AbstractStateMachine) -> None:
-    """Установка API-Ключа в настройках"""
-    print("API-Ключ изменен")  # FIXME: сделать нормальную смену API-ключа
-    pause()
-    state_machine.current_state = called_from_state.back_state
-
-
-def test():
+def show_menu():
     set_russian = FunctionState("Русский", set_russian_language)
     set_english = FunctionState("English", set_english_language)
 
@@ -140,7 +176,3 @@ def test():
         ])
 
     Menu(main_menu).run()
-
-
-if __name__ == "__main__":
-    test()
