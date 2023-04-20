@@ -2,7 +2,7 @@
 
 ## 1. Конфигурация
 
-Для запуска программы вам потребуются установленные python 3.10+ (https://www.python.org/downloads/) и git 
+Для запуска программы вам потребуются установленные python 3.7+ (https://www.python.org/downloads/) и git 
 (https://git-scm.com/downloads). На windows исполняемые файлы нужно добавить в системную переменную PATH.
 (https://www.educative.io/answers/how-to-add-python-to-path-variable-in-windows).
 
@@ -45,13 +45,7 @@
 
 ## 2. Запуск
 
-Все действия выполняются в терминале, в корневой папке проекта, с активированным виртуальным окружением (см. пункт 1.4)
-
-1. Перед ***первым*** запуском выполнить:
-    ```shell
-    python ./src/main.py createdb    
-    ```
-2. Запуск:
-    ```shell
-    python ./src/main.py start    
-    ```
+Для запуска в корневой папке проекта, с активированным виртуальным окружением (см. пункт 1.4) в терминал ввести:
+   ```shell
+   python ./src/main.py
+   ```

@@ -21,12 +21,15 @@ class SettingsModel(Base):
     language = Column(Enum(LanguageEnum), default=LanguageEnum.ru, nullable=False)
 
 
-def create_db() -> None:
-    """Создает базу данных с таблицей и записью настроек в ней"""
+def create_db_if_doesnt_exist() -> None:
+    """Создает базу данных с таблицей и записью настроек в ней, если она еще не существует"""
     Base.metadata.create_all(bind=engine)
     session = get_db_session()
-    session.add(SettingsModel())
-    session.commit()
+
+    instance = session.query(SettingsModel).get(1)
+    if not instance:
+        session.add(SettingsModel())
+        session.commit()
 
 
 def get_db_session():
