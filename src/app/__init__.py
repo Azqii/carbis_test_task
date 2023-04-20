@@ -1,7 +1,7 @@
 from .db import create_db_if_doesnt_exist
 
 
-def start():
+def start() -> None:
     create_db_if_doesnt_exist()
 
     # Если импортировать раньше, а таблица еще не создана возникает ошибка

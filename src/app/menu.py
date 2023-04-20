@@ -27,7 +27,11 @@ class AbstractMenuState(ABC):
 
     def __init__(self, title: str) -> None:
         self._title = title
-        self.back_state: Optional["AbstractMenuState"] = None
+        self._back_state: Optional["AbstractMenuState"] = None
+
+    @property
+    def back_state(self):
+        return self._back_state
 
     @abstractmethod
     def render(self, state_machine: AbstractStateMachine) -> None:
@@ -54,7 +58,7 @@ class SelectorState(AbstractMenuState):
         print(f"====={self._title}=====\n")
         for serial_number, state in enumerate(self._states, 1):
             print(f"{serial_number}. {state._title}")
-        print("\n0.", "Назад\n" if self.back_state else "Выход\n")
+        print("\n0.", "Назад\n" if self._back_state else "Выход\n")
 
         try:
             user_choice = int(input("Введите номер пункта меню для выбора: "))
@@ -69,10 +73,10 @@ class SelectorState(AbstractMenuState):
             return
 
         if user_choice == 0:
-            state_machine.current_state = self.back_state
+            state_machine.current_state = self._back_state
         else:
             state_machine.current_state = self._states[user_choice - 1]
-            state_machine.current_state.back_state = self
+            state_machine.current_state._back_state = self
 
 
 class FunctionState(AbstractMenuState):
